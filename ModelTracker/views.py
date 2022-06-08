@@ -2,23 +2,23 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 import datetime
-from .models import *
+from .models import History
 import simplejson
+
+
 def main(request):
-    if request.method=="GET":
-        models=request.session.get("models",None)
-        if not models:
-            models = [s['table'] for s in History.objects.values("table").distinct()]
-            request.session["models"]=models
-        res={"models": models}
-        return render(request,"main.html",res)
-    if request.method=="POST":
+    models = [s['table'] for s in History.objects.values("table").distinct()]
+    if request.method == "GET":
+        res = {"models": models}
+        return render(request, "main.html", res)
+    if request.method == "POST":
         id = request.POST["id"]
         table = request.POST["table"]
-        models = request.session.get("models", None)
-        res=fetchChanges(id,table)
-        res["models"]=models
-        return render(request,"main.html",res)
+        res = fetchChanges(id, table)
+        res["models"] = models
+        return render(request, "main.html", res)
+
+
 def get(lst,index,default):
     if index<len(lst): return lst[index]
     return default
